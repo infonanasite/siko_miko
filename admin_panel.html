@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CookieBot Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0d0f14;
+  --surface:   #13161e;
+  --surface2:  #1a1e2a;
+  --border:    #242836;
+  --accent:    #4f9eff;
+  --accent2:   #6b5eff;
+  --green:     #3ecf8e;
+  --red:       #f66;
+  --yellow:    #f5c542;
+  --text:      #e8eaf0;
+  --muted:     #6b7385;
+  --mono:      'JetBrains Mono', monospace;
+  --sans:      'DM Sans', sans-serif;
+  --sidebar-w: 220px;
+  --radius:    10px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Login ────────────────────────────────────────────── */
+#login {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 30% 50%, #1a1e2a 0%, #0d0f14 70%);
+}
+.login-box {
+  width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.5);
+}
+.login-logo {
+  font-size: 36px;
+  margin-bottom: 6px;
+}
+.login-title {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -.5px;
+  margin-bottom: 4px;
+}
+.login-sub {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 32px;
+}
+.login-box label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.login-box input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color .15s;
+}
+.login-box input:focus { border-color: var(--accent); }
+.login-err {
+  color: var(--red);
+  font-size: 12px;
+  margin-top: 8px;
+  min-height: 18px;
+}
+.btn-primary {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; margin-top: 20px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px;
+  cursor: pointer;
+  transition: opacity .15s, transform .1s;
+}
+.btn-primary:hover { opacity: .88; }
+.btn-primary:active { transform: scale(.98); }
+.btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── App shell ────────────────────────────────────────── */
+#app { display: flex; min-height: 100vh; }
+
+/* ── Sidebar ──────────────────────────────────────────── */
+#sidebar {
+  width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+}
+.sb-logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.sb-logo-icon { font-size: 22px; }
+.sb-logo-text {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -.3px;
+}
+.sb-logo-sub {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.sb-nav {
+  flex: 1;
+  padding: 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background .12s, color .12s;
+  user-select: none;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: rgba(79,158,255,.12); color: var(--accent); }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--red);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 20px;
+  min-width: 18px;
+  text-align: center;
+}
+.sb-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+.sb-footer-key {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  word-break: break-all;
+  margin-top: 6px;
+}
+.btn-logout {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color .12s, border-color .12s;
+}
+.btn-logout:hover { color: var(--red); border-color: var(--red); }
+
+/* ── Main content ─────────────────────────────────────── */
+#main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.page-header {
+  padding: 28px 32px 0;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px;
+}
+.page-title {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -.5px;
+}
+.page-sub {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 3px;
+}
+.page-body {
+  padding: 24px 32px 40px;
+  flex: 1;
+}
+
+/* ── Stats cards ──────────────────────────────────────── */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: border-color .15s;
+}
+.card:hover { border-color: #35394a; }
+.card-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.card-value {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  color: var(--text);
+}
+.card-value.green { color: var(--green); }
+.card-value.accent { color: var(--accent); }
+.card-value.yellow { color: var(--yellow); }
+.card-value.red { color: var(--red); }
+.card-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ── Section ──────────────────────────────────────────── */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.section-title {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -.2px;
+}
+.section-body { padding: 20px; }
+
+/* ── Table ────────────────────────────────────────────── */
+.tbl-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+thead th {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 12px 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+tbody tr {
+  border-top: 1px solid var(--border);
+  transition: background .1s;
+}
+tbody tr:hover { background: rgba(255,255,255,.02); }
+tbody td {
+  padding: 11px 12px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.mono { font-family: var(--mono); font-size: 12px; }
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--mono);
+}
+.badge-green  { background: rgba(62,207,142,.12); color: var(--green); }
+.badge-red    { background: rgba(255,102,102,.12); color: var(--red); }
+.badge-yellow { background: rgba(245,197,66,.12);  color: var(--yellow); }
+.badge-blue   { background: rgba(79,158,255,.12);  color: var(--accent); }
+.badge-grey   { background: rgba(107,115,133,.12); color: var(--muted); }
+
+/* ── Buttons ──────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--sans);
+  cursor: pointer;
+  border: none;
+  transition: opacity .12s, transform .1s;
+}
+.btn:active { transform: scale(.97); }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn-accent  { background: var(--accent); color: #fff; }
+.btn-green   { background: rgba(62,207,142,.15); color: var(--green); }
+.btn-red-s   { background: rgba(255,102,102,.12); color: var(--red); }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.btn:hover   { opacity: .82; }
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* ── Form ─────────────────────────────────────────────── */
+.form-row {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  align-items: flex-end;
+}
+.form-group { display: flex; flex-direction: column; gap: 6px; min-width: 140px; }
+.form-group.grow { flex: 1; }
+.form-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+input[type=text], input[type=number], select, textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color .15s;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+select { cursor: pointer; }
+textarea {
+  font-family: var(--mono);
+  font-size: 12px;
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* ── Stock bars ───────────────────────────────────────── */
+.stock-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.stock-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+.stock-top { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.stock-emoji { font-size: 18px; }
+.stock-name { font-weight: 600; font-size: 13px; }
+.stock-count {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--green);
+}
+.stock-bar-bg {
+  height: 4px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.stock-bar-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 4px;
+  transition: width .5s ease;
+}
+
+/* ── Pagination ───────────────────────────────────────── */
+.pagination {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 16px;
+}
+.page-info { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+
+/* ── Copy button ──────────────────────────────────────── */
+.copy-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color .12s;
+}
+.copy-btn:hover { color: var(--accent); }
+.copy-btn.copied { color: var(--green); }
+
+/* ── Toast ────────────────────────────────────────────── */
+#toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 8px 30px rgba(0,0,0,.4);
+  transform: translateY(80px);
+  opacity: 0;
+  transition: transform .25s, opacity .25s;
+  z-index: 999;
+  max-width: 320px;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.ok   { border-left: 3px solid var(--green); }
+#toast.err  { border-left: 3px solid var(--red); }
+
+/* ── Empty state ──────────────────────────────────────── */
+.empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--muted);
+}
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-text { font-size: 13px; }
+
+/* ── Loader ───────────────────────────────────────────── */
+.loader {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--muted); font-size: 13px;
+  padding: 20px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+
+/* ── Utils ────────────────────────────────────────────── */
+.flex { display: flex; align-items: center; gap: 8px; }
+.ml-auto { margin-left: auto; }
+.text-muted { color: var(--muted); }
+.text-sm { font-size: 12px; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ─── LOGIN ─────────────────────────────────────────────── -->
+<div id="login">
+  <div class="login-box">
+    <div class="login-logo">🍪</div>
+    <div class="login-title">CookieBot Admin</div>
+    <div class="login-sub">Enter your API key to continue</div>
+    <label for="key-input">API Key</label>
+    <input id="key-input" type="text" placeholder="Paste your ADMIN_API_KEY…" autocomplete="off" spellcheck="false">
+    <div class="login-err" id="login-err"></div>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">
+      <span id="login-label">Sign In</span>
+    </button>
+  </div>
+</div>
+
+<!-- ─── APP ───────────────────────────────────────────────── -->
+<div id="app" hidden>
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🍪</div>
+      <div>
+        <div class="sb-logo-text">CookieBot</div>
+        <div class="sb-logo-sub">Admin Panel</div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-item active" onclick="navigate('dashboard')">
+        <span class="nav-icon">📊</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="navigate('cookies')">
+        <span class="nav-icon">🍪</span> Cookies
+      </div>
+      <div class="nav-item" onclick="navigate('services')">
+        <span class="nav-icon">⚙️</span> Services
+      </div>
+      <div class="nav-item" onclick="navigate('codes')">
+        <span class="nav-icon">🎟️</span> Codes
+      </div>
+      <div class="nav-item" onclick="navigate('refunds')">
+        <span class="nav-icon">🔄</span> Refunds
+        <span class="nav-badge" id="refund-badge" hidden>0</span>
+      </div>
+      <div class="nav-item" onclick="navigate('admins')">
+        <span class="nav-icon">👮</span> Admins
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div id="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub">Live bot statistics</div>
+        </div>
+        <button class="btn btn-outline" onclick="loadDashboard()">↻ Refresh</button>
+      </div>
+      <div class="page-body">
+        <div class="cards" id="stat-cards">
+          <div class="loader"><div class="spinner"></div> Loading…</div>
+        </div>
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">Cookie Stock</div>
+          </div>
+          <div class="section-body">
+            <div class="stock-grid" id="stock-grid">
+              <div class="loader"><div class="spinner"></div> Loading…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COOKIES ── -->
+    <div id="page-cookies" hidden>
+      <div class="page-header">
+        <div>
+          <div class="page-title">Cookies</div>
+          <div class="page-sub">Add cookies to the bot's stock</div>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="section">
+          <div class="section-head"><div class="section-title">Add Cookie</div></div>
+          <div class="section-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Service</label>
+                <select id="cookie-service"></select>
+              </div>
+              <div class="form-group grow">
+                <label class="form-label">Cookie / Account Content</label>
+                <textarea id="cookie-content" placeholder="email:password  or  raw cookie string  or  email=x&#10;password=y"></textarea>
+              </div>
+            </div>
+            <div style="margin-top:12px">
+              <button class="btn btn-accent" onclick="addCookie()">+ Add Cookie</button>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-head"><div class="section-title">Current Stock</div></div>
+          <div class="section-body">
+            <div class="stock-grid" id="cookie-stock-grid">
+              <div class="loader"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SERVICES ── -->
+    <div id="page-services" hidden>
+      <div class="page-header">
+        <div>
+          <div class="page-title">Services</div>
+          <div class="page-sub">Manage streaming services</div>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="section">
+          <div class="section-head"><div class="section-title">Add Service</div></div>
+          <div class="section-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Key (slug)</label>
+                <input type="text" id="svc-key" placeholder="e.g. disney">
+              </div>
+              <div class="form-group grow">
+                <label class="form-label">Display Name</label>
+                <input type="text" id="svc-name" placeholder="e.g. Disney+">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Emoji</label>
+                <input type="text" id="svc-emoji" placeholder="🎬" style="width:80px">
+              </div>
+              <button class="btn btn-accent" style="margin-top:22px" onclick="addService()">+ Add</button>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-head"><div class="section-title">All Services</div></div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr>
+                <th>Emoji</th><th>Key</th><th>Name</th><th>Stock</th><th>Action</th>
+              </tr></thead>
+              <tbody id="services-tbody">
+                <tr><td colspan="5"><div class="loader"><div class="spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CODES ── -->
+    <div id="page-codes" hidden>
+      <div class="page-header">
+        <div>
+          <div class="page-title">Redeem Codes</div>
+          <div class="page-sub">Generate and manage giveaway codes</div>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="section">
+          <div class="section-head"><div class="section-title">Generate Codes</div></div>
+          <div class="section-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Service</label>
+                <select id="code-service"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Amount</label>
+                <input type="number" id="code-amount" value="1" min="1" max="100" style="width:90px">
+              </div>
+              <button class="btn btn-accent" style="margin-top:22px" onclick="generateCodes()">⚡ Generate</button>
+            </div>
+            <div id="generated-codes-box" hidden style="margin-top:16px">
+              <div class="section-title" style="margin-bottom:10px;font-size:12px">Generated codes — click to copy</div>
+              <div id="generated-codes-list" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">All Codes</div>
+            <div class="flex" style="gap:8px">
+              <select id="filter-code-service" onchange="loadCodes(1)" style="width:130px;padding:6px 10px;font-size:12px">
+                <option value="">All services</option>
+              </select>
+              <select id="filter-code-status" onchange="loadCodes(1)" style="width:110px;padding:6px 10px;font-size:12px">
+                <option value="">All</option>
+                <option value="unused">Unused</option>
+                <option value="used">Used</option>
+              </select>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr>
+                <th>Code</th><th>Service</th><th>Status</th><th>Used By</th><th>Created</th><th></th>
+              </tr></thead>
+              <tbody id="codes-tbody">
+                <tr><td colspan="6"><div class="loader"><div class="spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="section-body" style="padding-top:0">
+            <div class="pagination">
+              <button class="btn btn-outline btn-sm" id="codes-prev" onclick="loadCodes(codesPage-1)">← Prev</button>
+              <span class="page-info" id="codes-info">–</span>
+              <button class="btn btn-outline btn-sm" id="codes-next" onclick="loadCodes(codesPage+1)">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REFUNDS ── -->
+    <div id="page-refunds" hidden>
+      <div class="page-header">
+        <div>
+          <div class="page-title">Refunds</div>
+          <div class="page-sub">Review and resolve refund requests</div>
+        </div>
+        <select id="refund-status-filter" onchange="loadRefunds(1)" style="padding:8px 12px;font-size:13px;border-radius:7px">
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+          <option value="all">All</option>
+        </select>
+      </div>
+      <div class="page-body">
+        <div class="section">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr>
+                <th>#</th><th>User ID</th><th>Service</th><th>Status</th><th>Time</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="refunds-tbody">
+                <tr><td colspan="6"><div class="loader"><div class="spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="section-body" style="padding-top:0">
+            <div class="pagination">
+              <button class="btn btn-outline btn-sm" id="refunds-prev" onclick="loadRefunds(refundsPage-1)">← Prev</button>
+              <span class="page-info" id="refunds-info">–</span>
+              <button class="btn btn-outline btn-sm" id="refunds-next" onclick="loadRefunds(refundsPage+1)">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ADMINS ── -->
+    <div id="page-admins" hidden>
+      <div class="page-header">
+        <div>
+          <div class="page-title">Admins</div>
+          <div class="page-sub">Manage bot administrators</div>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="section">
+          <div class="section-head"><div class="section-title">Add Admin</div></div>
+          <div class="section-body">
+            <div class="form-row">
+              <div class="form-group grow">
+                <label class="form-label">Telegram User ID</label>
+                <input type="text" id="new-admin-id" placeholder="e.g. 123456789">
+              </div>
+              <button class="btn btn-accent" style="margin-top:22px" onclick="addAdmin()">+ Add Admin</button>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr>
+                <th>User ID</th><th>Role</th><th>Added At</th><th>Action</th>
+              </tr></thead>
+              <tbody id="admins-tbody">
+                <tr><td colspan="4"><div class="loader"><div class="spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<div id="toast"></div>
+
+<script>
+// ── State ───────────────────────────────────────────────────────────────────
+let API_KEY    = sessionStorage.getItem('ck_key') || '';
+let codesPage  = 1;
+let refundsPage = 1;
+
+// ── API helper ──────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const opts = {
+    method,
+    headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+  };
+  if (body !== undefined) opts.body = JSON.stringify(body);
+  const r = await fetch(path, opts);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || r.statusText);
+  return data;
+}
+const GET  = (p)    => api('GET', p);
+const POST = (p, b) => api('POST', p, b);
+const DEL  = (p)    => api('DELETE', p);
+
+// ── Toast ───────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg, type = 'ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className   = 'show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = '', 3000);
+}
+
+// ── Login ───────────────────────────────────────────────────────────────────
+document.getElementById('key-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+async function doLogin() {
+  const key = document.getElementById('key-input').value.trim();
+  if (!key) return;
+  const btn   = document.getElementById('login-btn');
+  const label = document.getElementById('login-label');
+  btn.disabled = true; label.textContent = 'Verifying…';
+  try {
+    await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key }),
+    }).then(r => { if (!r.ok) throw new Error(); });
+    API_KEY = key;
+    sessionStorage.setItem('ck_key', key);
+    document.getElementById('login').hidden = true;
+    document.getElementById('app').hidden   = false;
+    navigate('dashboard');
+  } catch {
+    document.getElementById('login-err').textContent = 'Invalid key. Check your ADMIN_API_KEY.';
+  }
+  btn.disabled = false; label.textContent = 'Sign In';
+}
+
+function logout() {
+  sessionStorage.removeItem('ck_key');
+  API_KEY = '';
+  document.getElementById('app').hidden   = true;
+  document.getElementById('login').hidden = false;
+  document.getElementById('key-input').value = '';
+}
+
+// Auto-login if key stored
+if (API_KEY) {
+  document.getElementById('login').hidden = true;
+  document.getElementById('app').hidden   = false;
+  // will navigate after dom ready
+}
+
+// ── Navigation ──────────────────────────────────────────────────────────────
+const PAGES = ['dashboard','cookies','services','codes','refunds','admins'];
+
+function navigate(page) {
+  PAGES.forEach(p => {
+    document.getElementById('page-' + p).hidden = p !== page;
+    const navEl = document.querySelector(`.nav-item[onclick="navigate('${p}')"]`);
+    if (navEl) navEl.classList.toggle('active', p === page);
+  });
+  if (page === 'dashboard') loadDashboard();
+  if (page === 'cookies')   loadCookiePage();
+  if (page === 'services')  loadServices();
+  if (page === 'codes')     { loadCodes(1); populateServiceSelect('code-service'); populateServiceSelect('filter-code-service', true); }
+  if (page === 'refunds')   loadRefunds(1);
+  if (page === 'admins')    loadAdmins();
+}
+
+// ── Dashboard ───────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  document.getElementById('stat-cards').innerHTML = '<div class="loader"><div class="spinner"></div> Loading…</div>';
+  document.getElementById('stock-grid').innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+  try {
+    const d = await GET('/api/stats');
+
+    // Update refund badge
+    const badge = document.getElementById('refund-badge');
+    if (d.pending_refunds > 0) {
+      badge.textContent = d.pending_refunds;
+      badge.hidden = false;
+    } else {
+      badge.hidden = true;
+    }
+
+    // Stat cards
+    const totalStock = Object.values(d.stock).reduce((a, b) => a + b, 0);
+    document.getElementById('stat-cards').innerHTML = `
+      <div class="card">
+        <div class="card-label">Total Stock</div>
+        <div class="card-value green">${totalStock}</div>
+        <div class="card-sub">cookies available</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Total Claimed</div>
+        <div class="card-value accent">${d.total_claimed}</div>
+        <div class="card-sub">all time</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Pending Refunds</div>
+        <div class="card-value ${d.pending_refunds > 0 ? 'red' : ''}">${d.pending_refunds}</div>
+        <div class="card-sub">${d.pending_refunds > 0 ? 'needs attention' : 'all clear'}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Codes Used</div>
+        <div class="card-value yellow">${d.used_codes}</div>
+        <div class="card-sub">of ${d.total_codes} total</div>
+      </div>
+      <div class="card">
+        <div class="card-label">DB Cookies</div>
+        <div class="card-value">${d.db_cookies.available}</div>
+        <div class="card-sub">of ${d.db_cookies.total} total in DB</div>
+      </div>
+    `;
+
+    // Stock grid
+    const maxStock = Math.max(...Object.values(d.stock), 1);
+    document.getElementById('stock-grid').innerHTML = d.services.map(s => {
+      const cnt = d.stock[s.key] || 0;
+      const pct = Math.round((cnt / maxStock) * 100);
+      return `<div class="stock-card">
+        <div class="stock-top">
+          <span class="stock-emoji">${s.emoji}</span>
+          <span class="stock-name">${s.name}</span>
+          <span class="stock-count">${cnt}</span>
+        </div>
+        <div class="stock-bar-bg">
+          <div class="stock-bar-fill" style="width:${pct}%"></div>
+        </div>
+      </div>`;
+    }).join('') || '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No services found.</div></div>';
+  } catch(e) {
+    toast('Failed to load stats: ' + e.message, 'err');
+  }
+}
+
+// ── Cookies ─────────────────────────────────────────────────────────────────
+async function loadCookiePage() {
+  populateServiceSelect('cookie-service');
+  loadCookieStock();
+}
+
+async function loadCookieStock() {
+  document.getElementById('cookie-stock-grid').innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+  try {
+    const [stats, svcs] = await Promise.all([GET('/api/stats'), GET('/api/services')]);
+    document.getElementById('cookie-stock-grid').innerHTML = svcs.map(s => {
+      const cnt = stats.stock[s.key] || 0;
+      return `<div class="stock-card">
+        <div class="stock-top">
+          <span class="stock-emoji">${s.emoji}</span>
+          <span class="stock-name">${s.name}</span>
+          <span class="stock-count">${cnt}</span>
+        </div>
+        <div class="card-sub" style="font-size:11px;margin-top:6px;color:var(--muted)">key: ${s.key}</div>
+      </div>`;
+    }).join('') || '<div class="empty"><div class="empty-icon">📭</div></div>';
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+async function addCookie() {
+  const service = document.getElementById('cookie-service').value;
+  const content = document.getElementById('cookie-content').value.trim();
+  if (!service || !content) { toast('Select a service and enter cookie content.', 'err'); return; }
+  try {
+    await POST('/api/cookies', { service, content });
+    document.getElementById('cookie-content').value = '';
+    toast('✅ Cookie added to ' + service + ' stock!');
+    loadCookieStock();
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+// ── Services ─────────────────────────────────────────────────────────────────
+async function loadServices() {
+  document.getElementById('services-tbody').innerHTML =
+    '<tr><td colspan="5"><div class="loader"><div class="spinner"></div></div></td></tr>';
+  try {
+    const svcs = await GET('/api/services');
+    if (!svcs.length) {
+      document.getElementById('services-tbody').innerHTML =
+        '<tr><td colspan="5"><div class="empty"><div class="empty-icon">🫙</div><div class="empty-text">No services yet.</div></div></td></tr>';
+      return;
+    }
+    document.getElementById('services-tbody').innerHTML = svcs.map(s => `
+      <tr>
+        <td style="font-size:20px">${s.emoji}</td>
+        <td><span class="mono">${s.key}</span></td>
+        <td>${s.name}</td>
+        <td><span class="badge ${s.stock > 0 ? 'badge-green' : 'badge-grey'}">${s.stock} cookies</span></td>
+        <td>
+          <button class="btn btn-red-s btn-sm" onclick="removeService('${s.key}', ${s.stock})">Remove</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+async function addService() {
+  const key   = document.getElementById('svc-key').value.trim().toLowerCase();
+  const name  = document.getElementById('svc-name').value.trim();
+  const emoji = document.getElementById('svc-emoji').value.trim() || '🍪';
+  if (!key || !name) { toast('Key and name are required.', 'err'); return; }
+  try {
+    await POST('/api/services', { key, name, emoji });
+    document.getElementById('svc-key').value = '';
+    document.getElementById('svc-name').value = '';
+    document.getElementById('svc-emoji').value = '';
+    toast('✅ Service ' + name + ' added!');
+    loadServices();
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+async function removeService(key, stock) {
+  if (stock > 0) { toast('Cannot remove service with ' + stock + ' cookies in stock.', 'err'); return; }
+  if (!confirm(`Remove service "${key}"?`)) return;
+  try {
+    await DEL('/api/services/' + key);
+    toast('✅ Service removed.');
+    loadServices();
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+// ── Codes ─────────────────────────────────────────────────────────────────────
+async function loadCodes(page = 1) {
+  codesPage = page;
+  const service = document.getElementById('filter-code-service')?.value || '';
+  const status  = document.getElementById('filter-code-status')?.value || '';
+  document.getElementById('codes-tbody').innerHTML =
+    '<tr><td colspan="6"><div class="loader"><div class="spinner"></div></div></td></tr>';
+  try {
+    let url = `/api/codes?page=${page}`;
+    if (service) url += '&service=' + service;
+    if (status)  url += '&status=' + status;
+    const d = await GET(url);
+    if (!d.items.length) {
+      document.getElementById('codes-tbody').innerHTML =
+        '<tr><td colspan="6"><div class="empty"><div class="empty-icon">🎟️</div><div class="empty-text">No codes found.</div></div></td></tr>';
+    } else {
+      document.getElementById('codes-tbody').innerHTML = d.items.map(c => `
+        <tr>
+          <td>
+            <span class="mono">${c.code}</span>
+            <button class="copy-btn" title="Copy" onclick="copyText('${c.code}', this)">⎘</button>
+          </td>
+          <td><span class="badge badge-blue">${c.service}</span></td>
+          <td><span class="badge ${c.used_by ? 'badge-grey' : 'badge-green'}">${c.used_by ? 'Used' : 'Unused'}</span></td>
+          <td class="mono text-muted">${c.used_by || '—'}</td>
+          <td class="mono text-muted text-sm">${c.created_at ? new Date(c.created_at * 1000).toLocaleDateString() : '—'}</td>
+          <td><button class="copy-btn" onclick="copyText('${c.code}', this)">⎘</button></td>
+        </tr>
+      `).join('');
+    }
+    const total = d.total;
+    const pages = Math.ceil(total / 50);
+    document.getElementById('codes-info').textContent = `Page ${page} of ${pages} (${total} total)`;
+    document.getElementById('codes-prev').disabled = page <= 1;
+    document.getElementById('codes-next').disabled = page >= pages;
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+async function generateCodes() {
+  const service = document.getElementById('code-service').value;
+  const amount  = parseInt(document.getElementById('code-amount').value) || 1;
+  if (!service) { toast('Select a service.', 'err'); return; }
+  try {
+    const d = await POST('/api/codes', { service, amount });
+    document.getElementById('generated-codes-box').hidden = false;
+    document.getElementById('generated-codes-list').innerHTML = d.codes.map(c => `
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 12px;cursor:pointer;font-family:var(--mono);font-size:12px"
+           onclick="copyText('${c}', this)" title="Click to copy">${c}</div>
+    `).join('');
+    toast(`✅ Generated ${d.codes.length} code(s)!`);
+    loadCodes(1);
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+// ── Refunds ──────────────────────────────────────────────────────────────────
+async function loadRefunds(page = 1) {
+  refundsPage = page;
+  const status = document.getElementById('refund-status-filter').value;
+  document.getElementById('refunds-tbody').innerHTML =
+    '<tr><td colspan="6"><div class="loader"><div class="spinner"></div></div></td></tr>';
+  try {
+    const d = await GET(`/api/refunds?status=${status}&page=${page}`);
+    if (!d.items.length) {
+      document.getElementById('refunds-tbody').innerHTML =
+        '<tr><td colspan="6"><div class="empty"><div class="empty-icon">✅</div><div class="empty-text">No refunds found.</div></div></td></tr>';
+    } else {
+      document.getElementById('refunds-tbody').innerHTML = d.items.map(r => {
+        const statusBadge = {
+          pending:  'badge-yellow',
+          approved: 'badge-green',
+          rejected: 'badge-red',
+        }[r.status] || 'badge-grey';
+        const actions = r.status === 'pending'
+          ? `<div class="flex" style="gap:6px">
+              <button class="btn btn-green btn-sm" onclick="resolveRefund(${r.id},'approve')">✅ Approve</button>
+              <button class="btn btn-red-s btn-sm" onclick="resolveRefund(${r.id},'reject')">✗ Reject</button>
+             </div>`
+          : `<span class="text-muted text-sm">—</span>`;
+        return `<tr>
+          <td class="mono">#${r.id}</td>
+          <td class="mono">${r.user_id}</td>
+          <td><span class="badge badge-blue">${r.service}</span></td>
+          <td><span class="badge ${statusBadge}">${r.status}</span></td>
+          <td class="mono text-muted text-sm">${r.requested_at_fmt}</td>
+          <td>${actions}</td>
+        </tr>`;
+      }).join('');
+    }
+    const pages = Math.ceil(d.total / 20);
+    document.getElementById('refunds-info').textContent = `Page ${page} of ${Math.max(1, pages)} (${d.total})`;
+    document.getElementById('refunds-prev').disabled = page <= 1;
+    document.getElementById('refunds-next').disabled = page >= pages;
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+async function resolveRefund(id, action) {
+  const label = action === 'approve' ? 'Approve' : 'Reject';
+  if (!confirm(`${label} refund #${id}?`)) return;
+  try {
+    await POST(`/api/refunds/${id}/${action}`);
+    toast(`✅ Refund #${id} ${action}d.`);
+    loadRefunds(refundsPage);
+    loadDashboard(); // update badge
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+// ── Admins ───────────────────────────────────────────────────────────────────
+async function loadAdmins() {
+  document.getElementById('admins-tbody').innerHTML =
+    '<tr><td colspan="4"><div class="loader"><div class="spinner"></div></div></td></tr>';
+  try {
+    const d = await GET('/api/admins');
+    const rows = [
+      `<tr>
+        <td class="mono">${d.master}</td>
+        <td><span class="badge badge-yellow">👑 Master</span></td>
+        <td class="text-muted">—</td>
+        <td>—</td>
+      </tr>`,
+      ...d.admins.map(a => `<tr>
+        <td class="mono">${a.user_id}</td>
+        <td><span class="badge badge-blue">Admin</span></td>
+        <td class="mono text-muted text-sm">${a.added_at ? new Date(a.added_at * 1000).toLocaleDateString() : '—'}</td>
+        <td><button class="btn btn-red-s btn-sm" onclick="removeAdmin(${a.user_id})">Remove</button></td>
+      </tr>`)
+    ];
+    document.getElementById('admins-tbody').innerHTML = rows.join('');
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+async function addAdmin() {
+  const uid = document.getElementById('new-admin-id').value.trim();
+  if (!uid) { toast('Enter a Telegram user ID.', 'err'); return; }
+  try {
+    await POST('/api/admins', { user_id: parseInt(uid) });
+    document.getElementById('new-admin-id').value = '';
+    toast('✅ Admin added!');
+    loadAdmins();
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+async function removeAdmin(uid) {
+  if (!confirm(`Remove admin ${uid}?`)) return;
+  try {
+    await DEL('/api/admins/' + uid);
+    toast('✅ Admin removed.');
+    loadAdmins();
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+// ── Shared utils ─────────────────────────────────────────────────────────────
+async function populateServiceSelect(id, addAll = false) {
+  try {
+    const svcs = await GET('/api/services');
+    const el   = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = (addAll ? '<option value="">All services</option>' : '') +
+      svcs.map(s => `<option value="${s.key}">${s.emoji} ${s.name}</option>`).join('');
+  } catch {}
+}
+
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    if (btn) { btn.classList.add('copied'); setTimeout(() => btn.classList.remove('copied'), 1500); }
+    toast('Copied!');
+  });
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  if (API_KEY) navigate('dashboard');
+});
+</script>
+</body>
+</html>

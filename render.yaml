@@ -1,0 +1,18 @@
+services:
+  - type: worker
+    name: stream-cookie-bot
+    runtime: python
+    plan: starter          # $7/mo — Render no longer offers free workers
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    disk:
+      name: bot-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_ID
+        sync: false
+      - key: DB_PATH
+        value: /data/bot_data.db

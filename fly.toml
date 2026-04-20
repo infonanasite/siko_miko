@@ -1,0 +1,33 @@
+# fly.toml — Fly.io deployment config
+# Free tier: 3 shared-cpu-1x 256MB VMs + 3 GB persistent volume
+
+app            = "stream-cookie-bot"   # change to your app name
+primary_region = "ams"                 # nearest region to you
+
+[build]
+
+[env]
+  DB_PATH = "/data/bot_data.db"        # stored on the persistent volume
+
+# Mount a persistent volume so SQLite survives restarts
+[[mounts]]
+  source      = "bot_data_vol"
+  destination = "/data"
+
+# No inbound HTTP needed for polling mode.
+# If you switch to webhook mode, uncomment the services block below and
+# set USE_WEBHOOK=true + WEBHOOK_URL=https://<app>.fly.dev in your secrets.
+#
+# [[services]]
+#   internal_port = 8080
+#   protocol      = "tcp"
+#   [[services.ports]]
+#     port     = 443
+#     handlers = ["tls", "http"]
+#   [[services.ports]]
+#     port     = 80
+#     handlers = ["http"]
+#   [[services.http_checks]]
+#     path     = "/webhook"
+#     interval = "10s"
+#     timeout  = "5s"
